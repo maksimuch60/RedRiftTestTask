@@ -1,31 +1,48 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
+using Configs;
+using Shared;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace WebModule
 {
     public class GetImageWebModule : MonoBehaviour
     {
-        private readonly List<Texture2D> _textures = new();
-        private const string _httpsRequest = "https://picsum.photos/174/145";
+        [SerializeField] private SpriteContainer _spriteContainer;
+        [SerializeField] private int _minImagesAmount;
+        [SerializeField] private int _maxImagesAmount;
         
-        public List<Texture2D> Textures => _textures;
 
-        public void LoadData(int amountOfImages, Action completedCallback = null)
-        {
-            Uri uri = new Uri(_httpsRequest);
-            StartCoroutine(GetRequest(uri, amountOfImages));
-            completedCallback?.Invoke();
-        }
+        private bool _isReady;
+        private int _amountOfImages;
         
-        IEnumerator GetRequest(Uri uri, int amountOfImages)
+        private const string _httpsRequest = "https://picsum.photos/174/150";
+
+        public bool IsReady => _isReady;
+
+        private void Awake()
         {
-            for (int i = 0; i < amountOfImages; i++)
+            _amountOfImages = Random.Range(_minImagesAmount, _maxImagesAmount + 1);
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            _spriteContainer.Clear();
+            
+            Uri uri = new Uri(_httpsRequest);
+            StartCoroutine(GetRequest(uri));
+        }
+
+        private IEnumerator GetRequest(Uri uri)
+        {
+            for (int i = 0; i < _amountOfImages; i++)
             {
                 using UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(uri);
-                webRequest.timeout = 5;
+                webRequest.timeout = 10;
                 yield return webRequest.SendWebRequest();
                 switch (webRequest.result)
                 {
@@ -37,10 +54,13 @@ namespace WebModule
                         Debug.LogError(": HTTP Error: " + webRequest.error);
                         break;
                     case UnityWebRequest.Result.Success:
-                        _textures.Add(DownloadHandlerTexture.GetContent(webRequest));
+                        _spriteContainer.Add(TextureToSpriteConverter.Convert(DownloadHandlerTexture.GetContent(webRequest)));
                         break;
                 }
             }
+
+            _isReady = true;
+            SceneManager.LoadScene("GameScene");
         }
     }
 }

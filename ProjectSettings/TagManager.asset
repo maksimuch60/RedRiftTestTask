@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Table
   layers:
   - Default
   - TransparentFX
@@ -43,4 +44,7 @@ TagManager:
     locked: 0
   - name: Card
     uniqueID: 2765497369
+    locked: 0
+  - name: CardObject
+    uniqueID: 1757174907
     locked: 0
