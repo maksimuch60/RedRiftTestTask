@@ -885,6 +885,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardSpawner: {fileID: 1888303648}
+  _table: {fileID: 1685822228}
   _arcCenterPoint: {fileID: 1773644809}
   _radius: 17
   _cardList: []
